@@ -1,0 +1,12 @@
+firebase-key.json
+google-services.json
+.env
+*.pyc
+__pycache__/
+db.sqlite3
+media/
+*.log
+.DS_Store
+staticfiles/
+venv/
+.claude/

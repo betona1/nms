@@ -1,0 +1,10 @@
+django>=5.0,<6.0
+djangorestframework
+django-cors-headers
+python-dotenv
+pymysql
+requests
+gunicorn
+whitenoise
+APScheduler>=3.10
+firebase-admin>=6.0

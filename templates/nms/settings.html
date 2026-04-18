@@ -1,0 +1,155 @@
+{% extends "nms/base.html" %}
+{% block title %}NMS 알림 설정{% endblock %}
+{% block nav_settings %}active{% endblock %}
+
+{% block content %}
+<h1 class="page-title">알림 설정</h1>
+
+<!-- Channel Management -->
+<section class="settings-section">
+    <div class="section-header">
+        <h2 class="section-title">알림 채널</h2>
+        <div class="section-actions">
+            <button class="btn btn-primary" onclick="showAddChannel('telegram')">+ Telegram</button>
+            <button class="btn btn-discord" onclick="showAddChannel('discord')">+ Discord</button>
+        </div>
+    </div>
+
+    <div class="channel-list" id="channel-list">
+        {% for ch in channels %}
+        <div class="channel-card" data-channel-id="{{ ch.id }}">
+            <div class="channel-icon {% if ch.channel_type == 'telegram' %}icon-telegram{% else %}icon-discord{% endif %}">
+                {% if ch.channel_type == 'telegram' %}
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.994 2C6.47 2 2 6.477 2 12s4.47 10 9.994 10C17.52 22 22 17.523 22 12S17.52 2 11.994 2zm4.804 6.656l-1.61 7.613c-.12.54-.44.67-.89.42l-2.46-1.82-1.19 1.14c-.13.13-.24.24-.49.24l.18-2.5 4.56-4.13c.2-.18-.04-.27-.3-.1l-5.64 3.56-2.43-.76c-.53-.17-.54-.53.11-.79l9.5-3.67c.44-.16.82.1.68.78z"/></svg>
+                {% else %}
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+                {% endif %}
+            </div>
+            <div class="channel-info">
+                <div class="channel-name">{{ ch.name }}</div>
+                <div class="channel-detail">
+                    {% if ch.channel_type == 'telegram' %}
+                    Chat ID: {{ ch.telegram_chat_id|default:"-" }}
+                    {% else %}
+                    Webhook: {{ ch.discord_webhook_url|truncatechars:50 }}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="channel-actions">
+                <label class="toggle">
+                    <input type="checkbox" {% if ch.is_active %}checked{% endif %} onchange="toggleChannel({{ ch.id }}, this.checked)">
+                    <span class="toggle-slider"></span>
+                </label>
+                <button class="btn btn-sm btn-outline" onclick="testChannel({{ ch.id }})">테스트</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteChannel({{ ch.id }})">삭제</button>
+            </div>
+        </div>
+        {% empty %}
+        <div class="no-data">등록된 알림 채널이 없습니다. Telegram 또는 Discord 채널을 추가하세요.</div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Subscription Matrix -->
+<section class="settings-section">
+    <div class="section-header">
+        <h2 class="section-title">구독 설정</h2>
+    </div>
+    <div class="sub-controls" id="sub-controls">
+        <select id="sub-channel-select" onchange="loadSubscriptions()">
+            <option value="">채널 선택...</option>
+            {% for ch in channels %}
+            <option value="{{ ch.id }}">{{ ch.name }} ({{ ch.channel_type }})</option>
+            {% endfor %}
+        </select>
+        <button class="btn btn-sm btn-outline" onclick="selectAllSubs(true)">전체 선택</button>
+        <button class="btn btn-sm btn-outline" onclick="selectAllSubs(false)">전체 해제</button>
+        <button class="btn btn-primary btn-sm" onclick="saveSubscriptions()">저장</button>
+    </div>
+    <div class="sub-matrix" id="sub-matrix">
+        <div class="no-data">위에서 채널을 선택하세요.</div>
+    </div>
+</section>
+
+<!-- Bot Setup Guide -->
+<section class="settings-section">
+    <div class="section-header">
+        <h2 class="section-title">봇 설정 가이드</h2>
+    </div>
+    <div class="guide-grid">
+        <div class="guide-card">
+            <h3 class="guide-title">
+                <svg viewBox="0 0 24 24" fill="#229ED9" width="20" height="20" style="vertical-align:middle;margin-right:6px;"><path d="M11.994 2C6.47 2 2 6.477 2 12s4.47 10 9.994 10C17.52 22 22 17.523 22 12S17.52 2 11.994 2zm4.804 6.656l-1.61 7.613c-.12.54-.44.67-.89.42l-2.46-1.82-1.19 1.14c-.13.13-.24.24-.49.24l.18-2.5 4.56-4.13c.2-.18-.04-.27-.3-.1l-5.64 3.56-2.43-.76c-.53-.17-.54-.53.11-.79l9.5-3.67c.44-.16.82.1.68.78z"/></svg>
+                Telegram 봇 만들기
+            </h3>
+            <ol class="guide-steps">
+                <li>텔레그램에서 <strong>@BotFather</strong> 검색하여 대화 시작</li>
+                <li><code>/newbot</code> 명령 입력</li>
+                <li>봇 이름 입력 (예: NMS Bitic Bot)</li>
+                <li>봇 username 입력 (예: nms_bitic_bot)</li>
+                <li>발급된 <strong>Bot Token</strong> 복사</li>
+                <li>봇을 그룹에 초대하거나 1:1 대화 시작</li>
+                <li><strong>Chat ID</strong> 확인: <code>https://api.telegram.org/bot{TOKEN}/getUpdates</code> 에서 <code>chat.id</code> 값 복사</li>
+                <li>또는 <strong>@userinfobot</strong> 에게 메시지 보내서 ID 확인</li>
+            </ol>
+        </div>
+        <div class="guide-card">
+            <h3 class="guide-title">
+                <svg viewBox="0 0 24 24" fill="#5865F2" width="20" height="20" style="vertical-align:middle;margin-right:6px;"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+                Discord Webhook 만들기
+            </h3>
+            <ol class="guide-steps">
+                <li>Discord 서버에서 <strong>서버 설정</strong> 클릭</li>
+                <li><strong>연동</strong> (Integrations) 메뉴 선택</li>
+                <li><strong>웹후크</strong> (Webhooks) 클릭</li>
+                <li><strong>새 웹후크</strong> 만들기 클릭</li>
+                <li>알림 받을 <strong>채널</strong> 선택</li>
+                <li><strong>웹후크 URL 복사</strong></li>
+                <li>복사한 URL을 위 채널 추가에 입력</li>
+            </ol>
+        </div>
+    </div>
+</section>
+
+<!-- Add Channel Modal -->
+<div class="modal-overlay" id="add-channel-modal" style="display:none;">
+    <div class="modal-content" style="max-width:480px;">
+        <div class="modal-header">
+            <h3 class="modal-title" id="add-channel-title">채널 추가</h3>
+            <button class="modal-close" onclick="closeAddChannel()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="add-channel-type">
+            <div class="form-group">
+                <label class="form-label">채널 이름</label>
+                <input type="text" class="form-input" id="add-channel-name" placeholder="예: 사무실 텔레그램">
+            </div>
+            <div id="telegram-fields" style="display:none;">
+                <div class="form-group">
+                    <label class="form-label">Bot Token</label>
+                    <input type="text" class="form-input" id="add-tg-token" placeholder="123456:ABC-DEF...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Chat ID</label>
+                    <input type="text" class="form-input" id="add-tg-chatid" placeholder="-100123456789">
+                </div>
+            </div>
+            <div id="discord-fields" style="display:none;">
+                <div class="form-group">
+                    <label class="form-label">Webhook URL</label>
+                    <input type="text" class="form-input" id="add-dc-webhook" placeholder="https://discord.com/api/webhooks/...">
+                </div>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-primary" onclick="saveChannel()">추가</button>
+                <button class="btn btn-outline" onclick="closeAddChannel()">취소</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% load static %}{% static 'js/nms-settings.js' %}"></script>
+{% endblock %}

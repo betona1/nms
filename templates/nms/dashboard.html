@@ -1,0 +1,200 @@
+{% extends "nms/base.html" %}
+{% block title %}NMS 대시보드{% endblock %}
+{% block nav_dashboard %}active{% endblock %}
+
+{% block content %}
+<!-- CPM Daily Report -->
+{% if cpm %}
+<div class="cpm-report">
+    <div class="cpm-report-inner">
+        <span class="cpm-logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:18px;height:18px;vertical-align:middle;"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            CPM
+        </span>
+        <span class="cpm-divider"></span>
+        <span class="cpm-stat"><span class="cpm-num cpm-today">{{ cpm.today }}</span><span class="cpm-label">오늘</span></span>
+        <span class="cpm-divider"></span>
+        <span class="cpm-stat"><span class="cpm-num">{{ cpm.total_prompts|floatformat:0 }}</span><span class="cpm-label">Prompts</span></span>
+        <span class="cpm-stat"><span class="cpm-num">{{ cpm.projects }}</span><span class="cpm-label">Projects</span></span>
+        <span class="cpm-stat"><span class="cpm-num">{{ cpm.total_tokens_display }}</span><span class="cpm-label">Tokens</span></span>
+        <span class="cpm-stat"><span class="cpm-num">{{ cpm.days }}</span><span class="cpm-label">Days</span></span>
+    </div>
+</div>
+{% endif %}
+
+<!-- Summary Bar -->
+<div class="summary-bar">
+    <div class="stat-card">
+        <span class="stat-num" id="stat-total">{{ summary.total }}</span>
+        <span class="stat-label">Total</span>
+    </div>
+    <div class="stat-card stat-up">
+        <span class="stat-icon">&#9650;</span>
+        <span class="stat-num" id="stat-up">{{ summary.up }}</span>
+        <span class="stat-label">Up</span>
+    </div>
+    <div class="stat-card stat-down">
+        <span class="stat-icon">&#9660;</span>
+        <span class="stat-num" id="stat-down">{{ summary.down }}</span>
+        <span class="stat-label">Down</span>
+    </div>
+    <div class="stat-card stat-warn">
+        <span class="stat-icon">&#9888;</span>
+        <span class="stat-num" id="stat-warn">{{ summary.warn }}</span>
+        <span class="stat-label">Warn</span>
+    </div>
+</div>
+
+<!-- Overall Status Banner -->
+<div class="status-banner" id="status-banner">
+    {% if summary.down > 0 %}
+    <span class="banner-dot banner-dot-down"></span>
+    <span>{{ summary.down }}개 장애 — {% for name in summary.down_names %}{{ name }}{% if not forloop.last %}, {% endif %}{% endfor %}</span>
+    {% elif summary.warn > 0 %}
+    <span class="banner-dot banner-dot-warn"></span>
+    <span>{{ summary.warn }}개 주의 — {% for name in summary.warn_names %}{{ name }}{% if not forloop.last %}, {% endif %}{% endfor %}</span>
+    {% else %}
+    <span class="banner-dot banner-dot-up"></span>
+    <span>All Systems Operational</span>
+    {% endif %}
+</div>
+
+<!-- Target Groups -->
+{% for group in groups %}
+<section class="target-group">
+    <div class="group-header">
+        <h2 class="group-title">
+            <span class="group-icon">{% if group.key == 'server' %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="6" rx="1"/><rect x="2" y="10" width="20" height="6" rx="1"/><circle cx="6" cy="5" r="1" fill="currentColor"/><circle cx="6" cy="13" r="1" fill="currentColor"/><line x1="10" y1="5" x2="18" y2="5"/><line x1="10" y1="13" x2="18" y2="13"/><path d="M8 18v4M16 18v4M6 22h12"/></svg>{% elif group.key == 'service' %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>{% elif group.key == 'domain' %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>{% elif group.key == 'cctv' %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>{% elif group.key == 'router' %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1" fill="currentColor"/></svg>{% endif %}</span>
+            {{ group.label }}
+        </h2>
+        <span class="group-count">{{ group.items|length }}</span>
+    </div>
+    <div class="target-grid">
+        {% for t in group.items %}
+        <div class="target-card card-{{ t.priority }} {% if group.key == 'domain' %}clickable{% endif %} {% if group.key == 'router' and t.host == '192.168.219.1' %}clickable{% endif %}" id="card-{{ t.id }}" data-target-id="{{ t.id }}" data-status="{{ t.last_status }}" data-priority="{{ t.priority }}" {% if group.key == 'domain' and t.check_url %}data-url="{{ t.check_url }}"{% endif %} {% if group.key == 'router' and t.host == '192.168.219.1' %}data-nat="true"{% endif %}>
+            <div class="card-icon-area">
+                <span class="card-icon {% if t.check_type == 'sms_device' %}icon-sms{% else %}icon-{{ group.key }}{% endif %}">
+                    {% if t.check_type == 'sms_device' %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="1" width="14" height="22" rx="3"/><line x1="9" y1="5" x2="15" y2="5"/><circle cx="12" cy="19" r="1" fill="currentColor"/><path d="M9 10l2 2 4-4" stroke-width="2"/></svg>{% elif group.key == 'server' %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="6" rx="1"/><rect x="2" y="10" width="20" height="6" rx="1"/><circle cx="6" cy="5" r="1" fill="currentColor"/><circle cx="6" cy="13" r="1" fill="currentColor"/><line x1="10" y1="5" x2="18" y2="5"/><line x1="10" y1="13" x2="18" y2="13"/><path d="M8 18v4M16 18v4M6 22h12"/></svg>{% elif group.key == 'service' %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>{% elif group.key == 'domain' %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>{% elif group.key == 'cctv' %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>{% elif group.key == 'router' %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1" fill="currentColor"/></svg>{% endif %}
+                </span>
+                <span class="status-dot status-{{ t.last_status }}"></span>
+            </div>
+            <div class="card-info">
+                <div class="card-top">
+                    <span class="target-name">{{ t.name }}</span>
+                    <span class="check-badge badge-{{ t.check_type }}">{{ t.check_type }}</span>
+                </div>
+                <div class="card-mid">
+                    <span class="target-host">{{ t.host }}{% if t.port %}:{{ t.port }}{% endif %} {% if group.key == 'domain' %}<span class="link-icon">&#8599;</span>{% endif %}</span>
+                </div>
+                <div class="card-bottom">
+                    <span class="response-time" id="rt-{{ t.id }}">
+                        {% if t.last_response_time %}{{ t.last_response_time|floatformat:1 }}ms{% else %}-{% endif %}
+                    </span>
+                    <span class="last-check" id="lc-{{ t.id }}">
+                        {% if t.last_checked %}{{ t.last_checked|date:"H:i:s" }}{% else %}--:--:--{% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endfor %}
+
+<!-- Recent Alerts -->
+<section class="alerts-section">
+    <div class="group-header">
+        <h2 class="group-title">Recent Alerts</h2>
+    </div>
+    <div class="alert-list" id="alert-list">
+        {% for alert in recent_alerts %}
+        <div class="alert-item alert-{{ alert.level }}">
+            <span class="alert-level-badge level-{{ alert.level }}">{{ alert.level|upper }}</span>
+            <span class="alert-title">{{ alert.title }}</span>
+            <span class="alert-time">{{ alert.sent_at|date:"m/d H:i" }}</span>
+            {% if alert.resolved_at %}
+            <span class="alert-resolved-badge">RESOLVED</span>
+            {% endif %}
+        </div>
+        {% endfor %}
+        {% if not recent_alerts %}
+        <div class="no-data">알림 없음</div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- NAT Info Modal -->
+<div class="modal-overlay" id="nat-modal" style="display:none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:20px;height:20px;vertical-align:middle;margin-right:6px;"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1" fill="currentColor"/></svg>
+                메인 공유기 NAT 설정
+            </h3>
+            <button class="modal-close" id="nat-modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="nat-info-bar">
+                <span class="nat-label">외부 IP (유동)</span>
+                <span class="nat-value">{{ router_info.external_ip }}</span>
+                <span class="nat-label">게이트웨이</span>
+                <span class="nat-value">{{ router_info.gateway }}</span>
+                <span class="nat-label">모델</span>
+                <span class="nat-value">{{ router_info.model }}</span>
+                <span class="nat-label">관리자</span>
+                <span class="nat-value">{{ router_info.admin_user }}</span>
+            </div>
+            <div class="nat-info-bar" style="margin-bottom:16px;">
+                <span class="nat-label">WiFi SSID</span>
+                <span class="nat-value">{{ router_info.wifi_ssid }}</span>
+                <span class="nat-label">DMZ</span>
+                <span class="nat-value {% if router_info.dmz_enabled %}dmz-on{% endif %}">{{ router_info.dmz_ip }} (Super DMZ ON)</span>
+            </div>
+            <table class="nat-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>외부 포트</th>
+                        <th>프로토콜</th>
+                        <th>내부 IP</th>
+                        <th>내부 포트</th>
+                        <th>설명</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for rule in nat_rules %}
+                    <tr>
+                        <td>{{ rule.no }}</td>
+                        <td class="port-cell">{{ rule.ext_port }}</td>
+                        <td>{{ rule.proto }}</td>
+                        <td class="ip-cell">{{ rule.int_ip }}</td>
+                        <td class="port-cell">{{ rule.int_port }}</td>
+                        <td>{{ rule.desc }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <h4 class="modal-section-title">IP 고정 할당 장비</h4>
+            <table class="nat-table">
+                <thead>
+                    <tr>
+                        <th>IP 주소</th>
+                        <th>MAC 주소</th>
+                        <th>장비명</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for dev in fixed_ips %}
+                    <tr>
+                        <td class="ip-cell">{{ dev.ip }}</td>
+                        <td class="mac-cell">{{ dev.mac }}</td>
+                        <td>{{ dev.name }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
