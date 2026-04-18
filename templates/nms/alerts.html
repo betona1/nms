@@ -1,0 +1,31 @@
+{% extends "nms/base.html" %}
+{% block title %}NMS 알림 이력{% endblock %}
+{% block nav_alerts %}active{% endblock %}
+
+{% block content %}
+<h2 class="page-title">Alert History</h2>
+<div class="alert-list">
+    {% for alert in alerts %}
+    <div class="alert-item alert-{{ alert.level }}">
+        <div class="alert-main">
+            <span class="alert-level-badge level-{{ alert.level }}">{{ alert.level|upper }}</span>
+            <span class="alert-title">{{ alert.title }}</span>
+        </div>
+        <div class="alert-detail">
+            <span class="alert-message">{{ alert.message }}</span>
+        </div>
+        <div class="alert-meta">
+            <span class="alert-time">{{ alert.sent_at|date:"Y-m-d H:i:s" }}</span>
+            {% if alert.resolved_at %}
+            <span class="alert-resolved-badge">Resolved {{ alert.resolved_at|date:"H:i:s" }}</span>
+            {% else %}
+            <span class="alert-open-badge">OPEN</span>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+    {% if not alerts %}
+    <div class="no-data">알림 이력이 없습니다</div>
+    {% endif %}
+</div>
+{% endblock %}

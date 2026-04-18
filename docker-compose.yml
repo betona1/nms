@@ -1,0 +1,19 @@
+services:
+  nms:
+    build: .
+    container_name: nms
+    network_mode: host
+    restart: always
+    volumes:
+      - ./firebase-key.json:/app/firebase-key.json:ro
+    environment:
+      - DB_HOST=192.168.219.200
+      - DB_NAME=nms
+      - DB_USER=root
+      - DB_PASSWORD=alswl0420@
+      - DJANGO_SECRET_KEY=nms-production-secret-key-change-me
+      - FIREBASE_KEY_PATH=/app/firebase-key.json
+      - INTERNAL_API_KEY=${INTERNAL_API_KEY:-nms-internal-key}
+      - CPM_BASE_URL=http://192.168.219.100:9200
+      - CCTV_BASE_URL=http://192.168.219.100:8200
+      - DEBUG=false
