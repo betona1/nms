@@ -199,3 +199,22 @@ class ChannelSubscription(models.Model):
     def __str__(self):
         target_name = self.target.name if self.target else '전체(외부 포함)'
         return f'{self.channel.name} → {target_name}'
+
+
+class DailySalesReport(models.Model):
+    date = models.DateField('날짜', unique=True, db_index=True)
+    total_sales = models.BigIntegerField('총매출', default=0)
+    total_cost = models.BigIntegerField('총원가', default=0)
+    total_ad_cost = models.BigIntegerField('총광고비', default=0)
+    total_profit = models.BigIntegerField('총수익', default=0)
+    total_orders = models.IntegerField('총주문수', default=0)
+    markets_json = models.JSONField('마켓별 데이터', default=dict)
+    updated_at = models.DateTimeField('갱신일', auto_now=True)
+
+    class Meta:
+        db_table = 'daily_sales_report'
+        ordering = ['-date']
+        verbose_name = '일일 매출 리포트'
+
+    def __str__(self):
+        return f'{self.date} 매출:{self.total_sales}'
