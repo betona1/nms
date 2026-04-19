@@ -107,7 +107,7 @@ def dashboard(request):
     router_info = {
         'external_ip': '106.247.220.118',
         'gateway': '192.168.219.1',
-        'model': 'ipTIME',
+        'model': 'LG',
         'wifi_ssid': 'bitic / bitic5G',
         'admin_user': 'joacham',
         'dmz_enabled': True,

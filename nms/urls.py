@@ -1,7 +1,9 @@
 from django.urls import path, include
+from django.views.generic import RedirectView
 from . import views_web
 
 urlpatterns = [
+    path('', RedirectView.as_view(url='dashboard/', permanent=False)),
     path('api/', include('nms.urls_api')),
     path('dashboard/', views_web.dashboard, name='dashboard'),
     path('alerts/', views_web.alerts_page, name='alerts'),

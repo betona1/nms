@@ -86,7 +86,7 @@
 
 | IP | 역할 | 모드 |
 |----|------|------|
-| 192.168.219.1 | 메인 공유기 | Router |
+| 192.168.219.1 | 메인 공유기 (LG) | Router |
 | 192.168.219.2 | 서브 공유기 | AP 모드 |
 | 192.168.219.3 | 서브 공유기 | AP 모드 |
 
@@ -472,6 +472,26 @@ media/
 | order | ~/projects/order | 8989 | 주문관리 |
 | naverterms | ~/projects/naverterms | 8900, 8901 | 네이버 순위추적 v3.0 |
 | jebudo | ~/projects/jebudo | 8080 | 제부도 물때 |
+
+---
+
+## Oracle Cloud 중계 서버
+
+| 항목 | 값 |
+|------|-----|
+| IP | 134.185.104.140 |
+| 도메인 | joacham.duckdns.org |
+| SSH | `ssh ubuntu@134.185.104.140` 또는 `ssh ubuntu@joacham.duckdns.org` |
+| OS | Ubuntu 24.04 (Linux 6.17.0-1010-oracle) |
+| Python | 3.12.3 |
+| Web | nginx(:80) |
+| 역할 | NMS → Oracle 중계 → Watch 8 앱 (FCM) |
+
+### 중계 API (nms-relay)
+- NMS(100번서버)가 outbound POST로 데이터 전송
+- Oracle이 수신하여 캐싱 + FCM으로 Watch 8에 전달
+- 엔드포인트: `/api/relay/heartbeat/`, `/api/relay/alert/`, `/api/relay/sync/`
+- 인증: `X-NMS-Key` 헤더 (공유 시크릿)
 
 ---
 

@@ -3,7 +3,7 @@ from nms.models import MonitorTarget, AlertRule
 
 SEED_DATA = [
     # === Routers ===
-    {'name': '메인 공유기 (ipTIME)', 'host': '192.168.219.1', 'check_type': 'ping', 'group': 'router', 'interval': 60},
+    {'name': '메인 공유기 (LG)', 'host': '192.168.219.1', 'check_type': 'ping', 'group': 'router', 'interval': 60},
     {'name': 'ASUS AP1', 'host': '192.168.219.2', 'check_type': 'ping', 'group': 'router', 'interval': 60},
     {'name': 'ASUS AP2', 'host': '192.168.219.3', 'check_type': 'ping', 'group': 'router', 'interval': 60},
 
@@ -53,6 +53,9 @@ SEED_DATA = [
     {'name': 'CCTV 포장룸 (Mer)', 'host': '192.168.219.223', 'check_type': 'ping', 'group': 'cctv', 'interval': 60},
     {'name': 'CCTV 큰창고방 (Mer)', 'host': '192.168.219.224', 'check_type': 'ping', 'group': 'cctv', 'interval': 60},
     {'name': 'CCTV 거실 (Mer)', 'host': '192.168.219.225', 'check_type': 'ping', 'group': 'cctv', 'interval': 60},
+
+    # === Oracle Cloud 중계서버 ===
+    {'name': 'NMS 중계서버 (Oracle Cloud)', 'host': '134.185.104.140', 'port': 80, 'check_type': 'http', 'check_url': 'http://134.185.104.140/api/relay/health/', 'group': 'server', 'interval': 60, 'priority': 'md'},
 
     # === Domains ===
     {'name': 'jebudo.901planner.cloud (100서버)', 'host': 'jebudo.901planner.cloud', 'check_type': 'http', 'check_url': 'https://jebudo.901planner.cloud/', 'group': 'domain', 'interval': 60},
