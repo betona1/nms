@@ -14,7 +14,7 @@ class MonitorTargetStatusSerializer(serializers.ModelSerializer):
         model = MonitorTarget
         fields = ['id', 'name', 'host', 'port', 'check_type', 'group',
                   'last_status', 'last_checked', 'last_response_time', 'fail_count',
-                  'priority']
+                  'priority', 'is_dev']
 
 
 class AlertRuleSerializer(serializers.ModelSerializer):

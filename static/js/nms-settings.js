@@ -202,6 +202,22 @@
         return div.innerHTML;
     }
 
+    // === Dev Toggle ===
+    window.toggleDev = function (targetId, checkbox) {
+        fetch(`${API}/targets/${targetId}/toggle-dev/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+        })
+            .then(r => r.json())
+            .then(data => {
+                checkbox.checked = data.is_dev;
+            })
+            .catch(e => {
+                alert('오류: ' + e);
+                checkbox.checked = !checkbox.checked;
+            });
+    };
+
     // Modal close on overlay click
     const modal = document.getElementById('add-channel-modal');
     if (modal) {

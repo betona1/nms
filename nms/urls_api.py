@@ -22,5 +22,6 @@ urlpatterns = [
     path('notify/bulk-subscribe/', views.bulk_subscribe, name='api-bulk-subscribe'),
     path('sync-cpm/', views.sync_cpm, name='api-sync-cpm'),
     path('sales/', views_sales.sales_report, name='api-sales-report'),
+    path('targets/<int:pk>/toggle-dev/', views.toggle_dev, name='api-toggle-dev'),
     path('', include(router.urls)),
 ]

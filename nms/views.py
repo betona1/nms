@@ -263,3 +263,15 @@ def sync_cpm(request):
         return Response({'ok': True, 'created': created, 'updated': updated})
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+def toggle_dev(request, pk):
+    """개발중 상태 토글"""
+    try:
+        target = MonitorTarget.objects.get(pk=pk)
+        target.is_dev = not target.is_dev
+        target.save()
+        return Response({'id': pk, 'is_dev': target.is_dev})
+    except MonitorTarget.DoesNotExist:
+        return Response({'error': 'Not found'}, status=status.HTTP_404_NOT_FOUND)

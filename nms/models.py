@@ -52,6 +52,7 @@ class MonitorTarget(models.Model):
     group = models.CharField('그룹', max_length=20, choices=GROUP_CHOICES, default='server')
     interval = models.IntegerField('체크 주기(초)', default=60)
     is_active = models.BooleanField('활성화', default=True)
+    is_dev = models.BooleanField('개발중', default=False)
     last_status = models.CharField('최근 상태', max_length=10, choices=STATUS_CHOICES, default='unknown')
     last_checked = models.DateTimeField('마지막 체크', null=True, blank=True)
     last_response_time = models.FloatField('최근 응답시간(ms)', null=True, blank=True)
