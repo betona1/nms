@@ -16,4 +16,6 @@ services:
       - INTERNAL_API_KEY=${INTERNAL_API_KEY:-nms-internal-key}
       - CPM_BASE_URL=http://192.168.219.100:9200
       - CCTV_BASE_URL=http://192.168.219.100:8200
+      - RELAY_URL=http://134.185.104.140
+      - RELAY_API_KEY=nms-relay-secret-2026
       - DEBUG=false

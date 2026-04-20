@@ -71,6 +71,29 @@
     </div>
 </section>
 
+<!-- Dev Mode Toggle -->
+<section class="settings-section">
+    <div class="section-header">
+        <h2 class="section-title">모니터링 대상 (개발중 토글)</h2>
+    </div>
+    <p style="color:#8892A4;font-size:13px;margin-bottom:12px;">개발중인 서비스는 알람에서 제외됩니다.</p>
+    <div class="target-dev-list">
+        {% for t in targets %}
+        <div class="target-dev-row" style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid #1E2738;">
+            <div style="display:flex;align-items:center;gap:8px;">
+                <span style="color:{% if t.last_status == 'up' %}#22C55E{% elif t.last_status == 'down' %}#EF4444{% else %}#F59E0B{% endif %};font-size:10px;">&#9679;</span>
+                <span style="color:#E8ECF1;font-size:14px;">{{ t.name }}</span>
+                <span style="color:#8892A4;font-size:12px;">{{ t.host }}{% if t.port %}:{{ t.port }}{% endif %}</span>
+            </div>
+            <label class="toggle" title="개발중">
+                <input type="checkbox" {% if t.is_dev %}checked{% endif %} onchange="toggleDev({{ t.id }}, this)">
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
 <!-- Bot Setup Guide -->
 <section class="settings-section">
     <div class="section-header">
