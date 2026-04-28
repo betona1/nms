@@ -25,6 +25,7 @@
                 updateBanner(data.summary);
                 updateTargets(data.targets);
                 updateAlerts(data.alerts);
+                updateSmsPhones(data.sms_phones);
             })
             .catch(() => {});
     }
@@ -111,6 +112,20 @@
                 ${resolved}
             </div>`;
         }).join('');
+    }
+
+    function updateSmsPhones(phones) {
+        if (!phones || phones.length === 0) return;
+        // Find all sms-phones containers
+        document.querySelectorAll('[id^="sms-phones-"]').forEach(el => {
+            el.innerHTML = phones.map(p => {
+                const cls = p.connected ? 'phone-connected' : 'phone-disconnected';
+                const ago = p.seconds_ago < 60 ? p.seconds_ago + '초' :
+                    Math.floor(p.seconds_ago / 60) + '분';
+                const label = p.alias || p.phone_number;
+                return `<span class="sms-phone-chip ${cls}"><span class="sms-phone-dot"></span>${escapeHtml(label)} ${ago}</span>`;
+            }).join('');
+        });
     }
 
     // Toast notification
