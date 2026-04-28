@@ -58,12 +58,40 @@ def status_overview(request):
     recent_alerts = Alert.objects.select_related('target').all()[:10]
     alerts_data = AlertSerializer(recent_alerts, many=True).data
 
+    # SMS device phone details
+    sms_phones = _get_sms_phone_status()
+
     return Response({
         'summary': {'total': total, 'up': up, 'down': down, 'warn': warn},
         'targets': serializer.data,
         'alerts': alerts_data,
+        'sms_phones': sms_phones,
         'server_time': timezone.now().isoformat(),
     })
+
+
+def _get_sms_phone_status():
+    """Fetch SMS phone connection status from ai100 API."""
+    try:
+        resp = http_requests.get(
+            'http://192.168.219.100:8001/api/cpc/sms/phone-status/',
+            timeout=3
+        )
+        if resp.status_code == 200:
+            devices = resp.json().get('devices', [])
+            return [
+                {
+                    'alias': d.get('alias', ''),
+                    'phone_number': d.get('phone_number', ''),
+                    'connected': d.get('connected', False),
+                    'seconds_ago': d.get('seconds_ago', 0),
+                }
+                for d in devices
+                if d.get('phone_number', '') != 'test'
+            ]
+    except Exception:
+        pass
+    return []
 
 
 @api_view(['GET'])

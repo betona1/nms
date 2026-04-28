@@ -488,6 +488,39 @@ a { color: var(--accent); text-decoration: none; }
     font-family: 'SF Mono', 'Menlo', monospace;
 }
 
+/* SMS Phone Status */
+.card-sms-phones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin: 4px 0;
+}
+.sms-phone-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.05);
+    color: var(--text-secondary);
+}
+.sms-phone-chip.phone-connected {
+    color: var(--status-up);
+}
+.sms-phone-chip.phone-disconnected {
+    color: var(--status-down);
+    background: rgba(239,68,68,0.1);
+}
+.sms-phone-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+}
+.phone-connected .sms-phone-dot { background: var(--status-up); }
+.phone-disconnected .sms-phone-dot { background: var(--status-down); }
+
 .card-bottom {
     display: flex;
     justify-content: space-between;

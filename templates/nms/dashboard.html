@@ -86,6 +86,9 @@
                 <div class="card-mid">
                     <span class="target-host">{{ t.host }}{% if t.port %}:{{ t.port }}{% endif %} {% if group.key == 'domain' %}<span class="link-icon">&#8599;</span>{% endif %}</span>
                 </div>
+                {% if t.check_type == 'sms_device' %}
+                <div class="card-sms-phones" id="sms-phones-{{ t.id }}"></div>
+                {% endif %}
                 <div class="card-bottom">
                     <span class="response-time" id="rt-{{ t.id }}">
                         {% if t.last_response_time %}{{ t.last_response_time|floatformat:1 }}ms{% else %}-{% endif %}
