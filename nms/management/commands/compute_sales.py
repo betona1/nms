@@ -1,4 +1,5 @@
 """4월 일별 매출 리포트를 DailySalesReport 테이블에 적재"""
+import os
 import pymysql
 from datetime import date, timedelta
 from django.core.management.base import BaseCommand
@@ -8,7 +9,7 @@ DB_CONFIG = {
     'host': '127.0.0.1',
     'port': 3307,
     'user': 'root',
-    'password': 'REDACTED',
+    'password': os.environ.get('DB_PASSWORD', ''),
     'charset': 'utf8mb4',
 }
 
